@@ -1,0 +1,75 @@
+Commands
+minikube start
+
+mkdir program-8
+cd program-8
+
+touch server.js nodejs-configmap.yaml nodejs-pod.yaml
+
+kubectl apply -f nodejs-configmap.yaml
+
+kubectl apply -f nodejs-pod.yaml
+
+kubectl get pods
+
+kubectl logs nodejs-pod
+
+kubectl port-forward pod/nodejs-pod 3000:3000
+
+
+
+server.js
+const http = require("http");
+
+const port = 3000;
+
+const server = http.createServer((req, res) => {
+  res.end("Hello from Node.js running inside Kubernetes!");
+});
+
+server.listen(port, () => {
+  console.log(`Server running at port ${port}`);
+});
+
+
+
+nodejs-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nodejs-config
+data:
+  server.js: |
+    const http = require("http");
+
+    const port = 3000;
+
+    const server = http.createServer((req, res) => {
+      res.end("Hello from Node.js running inside Kubernetes!");
+    });
+
+    server.listen(port, () => {
+      console.log(`Server running at port ${port}`);
+    });
+
+
+
+nodejs-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nodejs-pod
+spec:
+  containers:
+    - name: nodejs-container
+      image: node:18
+      command: ["node", "/app/server.js"]
+      ports:
+        - containerPort: 3000
+      volumeMounts:
+        - name: nodejs-volume
+          mountPath: /app
+  volumes:
+    - name: nodejs-volume
+      configMap:
+        name: nodejs-config

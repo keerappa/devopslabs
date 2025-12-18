@@ -1,0 +1,83 @@
+Here is **only the commands and code exactly in the same order as your lab manual pages**, no explanation, no extra text.
+
+---
+
+# **PROGRAM – 7 WRITEUP (AS PER MANUAL)**
+
+## **Commands:**
+
+```
+minikube start
+```
+
+```
+minikube status
+```
+
+```
+minikube delete
+minikube start --driver=docker
+```
+
+```
+kubectl apply -f nginx-deployment.yaml
+```
+
+```
+kubectl get deployments
+kubectl get pods
+```
+
+```
+kubectl expose deployment nginx-deployment --type=NodePort --port=80
+```
+
+```
+kubectl get svc
+```
+
+```
+minikube service nginx-deployment
+```
+
+```
+kubectl delete pods --all
+```
+
+```
+kubectl delete svc --all
+```
+
+```
+kubectl delete deployments --all
+```
+
+---
+
+## **YAML File: `nginx-deployment.yaml`**
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+
+---
+
+If you want, I can format it into a clean **PDF-ready lab record writeup**.
