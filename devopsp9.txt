@@ -1,0 +1,114 @@
+STEP 2
+
+nano namespaces.yaml
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod
+
+kubectl apply -f namespaces.yaml
+kubectl get namespaces
+
+
+STEP 3
+
+nano pods.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend-pod
+  namespace: dev
+  labels:
+    app: frontend
+    env: dev
+spec:
+  containers:
+  - name: frontend
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend-pod
+  namespace: dev
+  labels:
+    app: backend
+    env: dev
+spec:
+  containers:
+  - name: backend
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend-pod
+  namespace: prod
+  labels:
+    app: frontend
+    env: prod
+spec:
+  containers:
+  - name: frontend
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend-pod
+  namespace: prod
+  labels:
+    app: backend
+    env: prod
+spec:
+  containers:
+  - name: backend
+    image: nginx
+    ports:
+    - containerPort: 80
+
+kubectl apply -f pods.yaml
+
+
+STEP 4
+
+kubectl get pods -n dev
+kubectl get pods -n prod
+
+
+STEP 5
+
+kubectl get pods -n dev -l app=frontend
+kubectl get pods -n dev -l app=backend
+kubectl get pods -n prod -l app=frontend
+kubectl get pods -n prod -l app=backend
+
+
+STEP 6
+
+kubectl delete pods --all -n dev
+kubectl delete pods --all -n prod
+
+
+STEP 7
+
+kubectl delete namespace dev
+kubectl delete namespace prod
+
+
+STEP 8
+
+kubectl get pods --all-namespaces
