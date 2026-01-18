@@ -1,0 +1,87 @@
+Understood.
+Below is **everything in correct order** — **only code and commands**, **no explanation**.
+
+---
+
+### 1. Create project
+
+```bash
+mkdir program3
+cd program3
+```
+
+```bash
+touch app.js package.json Dockerfile
+```
+
+---
+
+### 2. app.js
+
+```js
+const http = require("http");
+
+http.createServer((req, res) => {
+  res.end("Hello from Node Docker");
+}).listen(5000);
+```
+
+---
+
+### 3. package.json
+
+```json
+{
+  "name": "simple-node-docker",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  }
+}
+```
+
+---
+
+### 4. Dockerfile
+
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY package.json .
+COPY app.js .
+EXPOSE 5000
+CMD ["npm", "start"]
+```
+
+---
+
+### 5. Build image
+
+```bash
+docker build --no-cache -t program3 .
+```
+
+---
+
+### 6. Verify image
+
+```bash
+docker images program3
+```
+
+---
+
+### 7. Run container
+
+```bash
+docker run -p 5000:5000 program3
+```
+
+---
+
+### 8. Test
+
+```
+http://localhost:5000
+```

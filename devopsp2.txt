@@ -1,0 +1,91 @@
+### 📁 Project Structure
+
+```bash
+mkdir program-2
+cd program-2
+touch Dockerfile package.json
+mkdir src
+touch src/index.js
+```
+
+---
+
+### 📄 package.json
+
+```json
+{
+  "name": "program-2-multistage",
+  "version": "1.0.0",
+  "description": "Multi-stage Dockerfile demo",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+```
+
+---
+
+### 📄 src/index.js
+
+```js
+const express = require("express");
+
+const app = express();
+const PORT = 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello from multi-stage Docker!");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+```
+
+---
+
+### 📄 Dockerfile
+
+```dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+COPY src ./src
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+COPY package.json ./
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+---
+
+### 🛠️ Build Image
+
+```bash
+docker build -t program-2 .
+```
+
+---
+
+### ▶️ Run Container
+
+```bash
+docker run -it -p 3000:3000 program-2
+```
+
+---
+
+### 🌐 Verify
+
+```
+http://localhost:3000
+```
