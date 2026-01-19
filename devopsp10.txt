@@ -1,41 +1,53 @@
-Program 10 – Commands (Correct Order)
-Step 1: Start Minikube
+pgrm10
+
+depolyment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+
 minikube start --cpus=2 --memory=4096
-
-Step 2: Enable Dashboard
 minikube dashboard
 
-Step 3: Create NGINX Deployment (2 replicas)
-kubectl create deployment nginx-deployment --image=nginx --replicas=2
-
-kubectl get deployments
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
 kubectl get pods
-
-Step 4: Expose Deployment as NodePort Service
-kubectl expose deployment nginx-deployment --type=NodePort --port=80
-
-kubectl get services
-kubectl describe service nginx-deployment
-
-Step 5: Check Pod Labels
-kubectl get pods --show-labels
-
-Step 6: Fix Service Selector (if required)
-kubectl patch service nginx-deployment -p '{"spec":{"selector":{"app":"nginx-deployment"}}}'
-
-kubectl describe service nginx-deployment
-kubectl get endpoints nginx-deployment
-
-Step 7: Access Application
-minikube service nginx-deployment
-
-Step 8: Verify in Dashboard
-minikube dashboard
-
-Step 9: Cleanup
-kubectl delete service nginx-deployment
-kubectl delete deployment nginx-deployment
-
-kubectl get deployments
-kubectl get pods
-kubectl get services
+kubectl get nodes
+kubectl get svc
+kubectl logs <pod_name>
+kubectl describe pod <Pod_name>
+minikube service nginx-service
+kubectl delete --all
