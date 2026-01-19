@@ -1,0 +1,129 @@
+```
+PROGRAM–6 : AUTOMATED BUILD PIPELINE USING DOCKER HUB
+```
+
+---
+
+### STEP 1: Create Project Directory
+
+```bash
+mkdir program-6
+cd program-6
+```
+
+---
+
+### STEP 2: Create Application Files
+
+**index.js**
+
+```js
+const http = require("http");
+
+http.createServer((req, res) => {
+  res.end("DevOps Program 6\n");
+}).listen(3000);
+```
+
+**package.json**
+
+```json
+{
+  "name": "program-6",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
+```
+
+---
+
+### STEP 3: Create Dockerfile
+
+**Dockerfile**
+
+```Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+---
+
+### STEP 4: Build Docker Image
+
+```bash
+docker build -t program6 .
+```
+
+---
+
+### STEP 5: Tag Image for Docker Hub
+
+```bash
+docker tag program6:latest <dockerhub-username>/program6:latest
+```
+
+---
+
+### STEP 6: Login to Docker Hub
+
+```bash
+docker login -u <dockerhub-username>
+```
+
+---
+
+### STEP 7: Push Image to Docker Hub
+
+```bash
+docker push <dockerhub-username>/program6:latest
+```
+
+---
+
+### STEP 8: Tag Image for GitHub Container Registry (GHCR)
+
+```bash
+docker tag program6:latest ghcr.io/<github-username>/program6:latest
+```
+
+---
+
+### STEP 9: Login to GHCR
+
+```bash
+echo <GITHUB_PAT> | docker login ghcr.io -u <github-username> --password-stdin
+```
+
+---
+
+### STEP 10: Push Image to GHCR
+
+```bash
+docker push ghcr.io/<github-username>/program6:latest
+```
+
+---
+
+### STEP 11: Push Source Code to GitHub
+
+```bash
+git init
+git remote add origin https://github.com/<github-username>/<github-username>.git
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git push -u origin main
+```
+
+---
+
+```
+END
+```
