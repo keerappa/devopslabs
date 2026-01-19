@@ -1,0 +1,125 @@
+eamFinder - Project Overview & Commands
+What it is:
+TeamFinder is a full-stack MERN web application for college students to discover hackathons, ideathons, and competitions, then form teams based on complementary skills. It has JWT authentication, role-based access (student/admin), event CRUD operations, team formation with invitations, skill-based teammate search, and user profiles.
+
+Architecture:
+Frontend uses React 18 with Vite build tool and Tailwind CSS for styling. Backend is Node.js with Express framework connecting to MongoDB database. Authentication uses JWT tokens (access + refresh). Security includes Helmet headers, CORS, rate limiting, and bcrypt password hashing. DevOps setup includes Dockerfiles for both services, Kubernetes manifests for deployment, and a Jenkins pipeline for CI/CD.
+
+
+
+
+How to Run - All Commands in Order
+Local Development Setup:
+First ensure MongoDB is running on your system with: sudo systemctl start mongod or just mongod if not using systemd.
+
+Clone the repository and navigate to it, then from the project root run: npm run install:all - this installs dependencies for root, backend, and frontend folders.
+
+Next create a .env file inside the backend folder. Navigate there with: cd backend, then create the file with your text editor or use: nano .env
+
+Add these variables:
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/teamfinder
+JWT_ACCESS_SECRET=your_super_secret_access_key_change_this
+JWT_REFRESH_SECRET=your_super_secret_refresh_key_change_this
+CORS_ORIGIN=http://localhost:5173
+MAX_FILE_SIZE=5242880
+UPLOAD_DIR=uploads
+
+Return to root with: cd ..
+
+Finally run: npm run dev - this starts both backend on port 5000 and frontend on port 5173 using concurrently.
+
+Access frontend at: http://localhost:5173 and backend API at: http://localhost:5000
+
+Docker Deployment:
+Build backend image: docker build -t teamfinder-backend:v1 ./backend
+
+Build frontend image: docker build -t teamfinder-frontend:v1 ./frontend
+
+Start MongoDB container: docker run -d --name mongo -p 27017:27017 mongo:latest
+
+Run backend container: docker run -d --name backend -p 5000:5000 -e MONGODB_URI=mongodb://mongo:27017/teamfinder --link mongo teamfinder-backend:v1
+
+Run frontend container: docker run -d --name frontend -p 80:80 teamfinder-frontend:v1
+
+Check running containers: docker ps
+
+View container logs: docker logs backend or docker logs frontend
+
+Kubernetes Deployment:
+Start minikube cluster: minikube start
+
+Check cluster status: minikube status
+
+Create teamfinder namespace: kubectl apply -f namespace.yaml
+
+Deploy backend configmap: kubectl apply -f backend-configmap.yaml
+
+Deploy backend secrets: kubectl apply -f backend-secret.yaml
+
+Deploy backend deployment: kubectl apply -f backend-deployment.yaml
+
+Deploy backend service: kubectl apply -f backend-service.yaml
+
+Deploy frontend configmap: kubectl apply -f frontend-configmap.yaml
+
+Deploy frontend deployment: kubectl apply -f frontend-deployment.yaml
+
+Deploy frontend service: kubectl apply -f frontend-service.yaml
+
+Check pod status: kubectl get pods -n teamfinder - all pods should show Running status
+
+Check all resources: kubectl get all -n teamfinder
+
+View pod logs: kubectl logs -f <pod-name> -n teamfinder
+
+Access frontend service: minikube service frontend-service -n teamfinder
+
+Get service details: kubectl get svc -n teamfinder
+
+Delete deployment: kubectl delete -f k8s/ to remove all resources
+
+Jenkins CI/CD Pipeline:
+Start Jenkins container: docker run -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock --user root --name jenkins jenkins/jenkins:lts
+
+Wait for Jenkins to start (about 30 seconds), then get admin password: docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+Access Jenkins UI: http://localhost:8080 - paste the admin password
+
+Install Docker inside Jenkins container: docker exec -u root jenkins bash -c "apt-get update && apt-get install -y docker.io && chmod 666 /var/run/docker.sock"
+
+Verify Docker works in Jenkins: docker exec jenkins docker --version
+
+Copy project to Jenkins: docker cp /path/to/Full_Stack_EL jenkins:/workspace
+
+Run build script inside Jenkins: docker exec jenkins bash -c "cd /workspace && chmod +x build-docker.sh && ./build-docker.sh"
+
+In Jenkins UI, create new Pipeline job, point to Jenkinsfile in your repository. The pipeline will automatically: checkout code, build Docker images for backend and frontend, push to Docker Hub (needs credentials configured), and deploy to Kubernetes cluster with rolling updates.
+
+Check Jenkins build logs for console output showing successful builds.
+
+Verification Commands:
+Check Docker images: docker images | grep teamfinder
+
+Test backend API health: curl http://localhost:5000/api/health
+
+Check Kubernetes pods: kubectl get pods -n teamfinder -o wide
+
+Check Kubernetes services: kubectl get svc -n teamfinder
+
+Port forward for testing: kubectl port-forward service/frontend-service 8080:80 -n teamfinder
+
+View deployment status: kubectl rollout status deployment/backend -n teamfinder
+
+Scale deployment: kubectl scale deployment/backend --replicas=3 -n teamfinder
+
+Stop minikube: minikube stop
+
+Delete minikube cluster: minikube delete
+
+Key Points:
+
+Backend runs on port 5000 with API endpoints at /api/auth, /api/users, /api/events, /api/teams. Frontend runs on port 5173 in development or port 80 in production via nginx. MongoDB needs to be accessible on port 27017. Kubernetes deployment creates 2 backend replicas and 1 frontend replica for load balancing and high availability. Jenkins pipeline automates the entire build-push-deploy workflow.
+
+Claude Sonnet 4.5 • 1x
